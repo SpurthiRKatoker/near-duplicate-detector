@@ -34,6 +34,7 @@ Evaluation against the Quora Question Pairs (QQP) dataset.
 
 ## Recommended Threshold: 0.75
 
+
 `0.75` gives the best F1 on the tuning slice (0.7168) and holds up on the held-out test set (0.7388) — actually improving slightly, which suggests the tuning slice was representative and the threshold isn't overfit.
 
 **Why 0.75 over 0.80?**  
@@ -42,3 +43,16 @@ The F1 difference is small (0.7168 vs 0.7112), but 0.75 retains meaningfully hig
 **When to use a different threshold:**
 - Use `0.85` if you want high-confidence merges only and are comfortable missing duplicates
 - Use `0.70` if recall is paramount and you have a human review step to filter false positives
+
+## Domain Note
+The 0.50 threshold was tuned on conversational Quora questions. 
+For formal RFP/technical language, a lower threshold (0.60) works 
+better because the same meaning is expressed with more varied vocabulary.
+This is expected — the model is domain-agnostic and formal language 
+naturally produces lower similarity scores for equivalent questions.
+
+
+Guideline:
+
+Conversational questions (Quora-style): use 0.75
+Formal/technical questions (RFP-style): use 0.60
