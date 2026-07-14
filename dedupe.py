@@ -1,6 +1,7 @@
 import argparse
 import pandas as pd
 import networkx as nx
+import numpy as np
 
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -102,6 +103,19 @@ def main():
 
     print("Generating embeddings...")
     embeddings = generate_embeddings(questions, model)
+    # Ensure embeddings are a numpy array for downstream operations
+    embeddings = np.array(embeddings)
+
+    # Diagnostic: compute basic similarity stats to help choose a threshold
+    pairwise = cosine_similarity(embeddings)
+    # ignore self-similarity on diagonal when computing max
+    n = pairwise.shape[0]
+    if n > 1:
+        max_sim = np.max(pairwise - np.eye(n))
+        print(f"\nEmbedding similarity stats: max_nonself={max_sim:.4f}")
+        if max_sim < args.threshold:
+            print(f"Note: current threshold={args.threshold} is above the observed max similarity.")
+            print(f"Try a lower threshold (e.g. {max_sim - 0.05:.2f} to {max_sim:.2f}).")
 
     print("Building similarity graph...")
     graph = build_similarity_graph(
